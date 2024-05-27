@@ -3,7 +3,6 @@ package com.example.eshop.controller;
 import com.example.eshop.dto.CreateUserRequest;
 import com.example.eshop.dto.UpdateUserRequest;
 import com.example.eshop.dto.UserDto;
-import com.example.eshop.model.User;
 import com.example.eshop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @GetMapping("/{email}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable("email") String email) {
+        return ResponseEntity.ok(userService.getUserById(email));
     }
 
     @PostMapping
@@ -33,20 +32,20 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(request));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    @PutMapping("/{email}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable("email") String email, @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(email, request));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> deactiveUser(@PathVariable("id") Long id) {
-        userService.deactiveUser(id);
+    @PatchMapping("/{email}")
+    public ResponseEntity<Void> deactiveUser(@PathVariable("email") String email) {
+        userService.deactiveUser(email);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("email") String email) {
+        userService.deleteUser(email);
         return ResponseEntity.ok().build();
     }
 }

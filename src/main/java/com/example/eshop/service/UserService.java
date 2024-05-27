@@ -24,8 +24,8 @@ public class UserService {
         return userRepository.findAll().stream().map(userDtoConverter::convert).collect(Collectors.toList());
     }
 
-    public UserDto getUserById(Long id) {
-        User user = findUserById(id);
+    public UserDto getUserById(String email) {
+        User user = findUserByEmail(email);
         return userDtoConverter.convert(user);
     }
 
@@ -34,8 +34,8 @@ public class UserService {
         return userDtoConverter.convert(userRepository.save(user));
     }
 
-    public UserDto updateUser(Long id, UpdateUserRequest request) {
-        User user = findUserById(id);
+    public UserDto updateUser(String email, UpdateUserRequest request) {
+        User user = findUserByEmail(email);
         User updatedUser = new User();
         updatedUser.setId(user.getId());
         updatedUser.setFirstName(request.getFirstName());
@@ -43,18 +43,18 @@ public class UserService {
         return userDtoConverter.convert(userRepository.save(updatedUser));
     }
 
-    private User findUserById(Long id) {
-       return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User couldn't be found by following id: " + id));
-    }
-
-    public void deactiveUser(Long id) {
-       User user = findUserById(id);
+    public void deactiveUser(String email) {
+       User user = findUserByEmail(email);
        user.setActive(false);
        userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
-        User user = findUserById(id);
+    public void deleteUser(String email) {
+        User user = findUserByEmail(email);
         userRepository.delete(user);
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User couldn't be found by following email: " + email));
     }
 }
