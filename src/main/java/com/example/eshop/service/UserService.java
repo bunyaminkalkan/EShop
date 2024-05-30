@@ -4,6 +4,7 @@ import com.example.eshop.dto.CreateUserRequest;
 import com.example.eshop.dto.UpdateUserRequest;
 import com.example.eshop.dto.UserDto;
 import com.example.eshop.dto.UserDtoConverter;
+import com.example.eshop.exception.UserIsNotActiveException;
 import com.example.eshop.exception.UserNotFoundException;
 import com.example.eshop.model.User;
 import com.example.eshop.repository.UserRepository;
@@ -30,26 +31,37 @@ public class UserService {
     }
 
     public UserDto createUser(CreateUserRequest request) {
-        User user = new User(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword());
+        User user = new User(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword(), true);
         return userDtoConverter.convert(userRepository.save(user));
     }
 
     public UserDto updateUser(String email, UpdateUserRequest request) {
         User user = findUserByEmail(email);
-        User updatedUser = new User();
-        updatedUser.setId(user.getId());
-        updatedUser.setFirstName(request.getFirstName());
-        updatedUser.setLastName(request.getLastName());
+        if(!user.getIsActive()) {
+            throw new UserIsNotActiveException();
+        }
+        User updatedUser = new User(
+                user.getId(),
+                request.getFirstName(),
+                request.getLastName(),
+                user.getEmail(),
+                user.getPassword()
+        );
         return userDtoConverter.convert(userRepository.save(updatedUser));
     }
 
-    public void deactiveUser(String email) {
-       User user = findUserByEmail(email);
-       user.setActive(false);
-       userRepository.save(user);
+    public void deactivateUser(String email) {
+        changeActiveStatus(email, false);
+    }
+
+    public void activateUser(String email) {
+        changeActiveStatus(email, true);
     }
 
     public void deleteUser(String email) {
+        if(!doesUserExist(email)) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
         User user = findUserByEmail(email);
         userRepository.delete(user);
     }
@@ -57,4 +69,23 @@ public class UserService {
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User couldn't be found by following email: " + email));
     }
+
+    private void changeActiveStatus(String email, boolean active) {
+        User user = findUserByEmail(email);
+        User updatedUser = new User(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPassword(),
+                active
+        );
+        userRepository.save(updatedUser);
+    }
+
+    private Boolean doesUserExist(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+
 }
