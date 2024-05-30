@@ -22,10 +22,10 @@ public class UserService {
     private final UserDtoConverter userDtoConverter;
 
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(userDtoConverter::convert).collect(Collectors.toList());
+        return userDtoConverter.convert(userRepository.findAll());
     }
 
-    public UserDto getUserById(String email) {
+    public UserDto getUserByEmail(String email) {
         User user = findUserByEmail(email);
         return userDtoConverter.convert(user);
     }

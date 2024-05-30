@@ -23,8 +23,8 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable("email") String email) {
-        return ResponseEntity.ok(userService.getUserById(email));
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable("email") String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @PostMapping
